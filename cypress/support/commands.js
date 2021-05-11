@@ -10,7 +10,15 @@
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+Cypress.Commands.add('login', (email, password) => {
+    cy.get('#email').type(email);
+    cy.get('#password').type(password);
+    cy.get('.btn').click();
+});
+Cypress.Commands.add('clearLoginInputs', () => {
+    cy.get('#email').clear();
+    cy.get('#password').clear();
+})
 //
 //
 // -- This is a child command --
@@ -23,3 +31,4 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
