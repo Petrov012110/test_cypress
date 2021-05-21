@@ -22,42 +22,56 @@ describe('check posts', () => {
             .should('exist')
             .click();
     });
-
     it('Get login page', () => {
         cy.visit('localhost:4200/admin');
         cy.url().should('contain', 'admin');
         cy.get('.card').should('exist');
     });
-    it('Login check validator email', () => {
+    it('Login check validator email 1', () => {
+        cy.log('INCORRECT EMAIL AND CORRECT PASSWORD');
         cy.login('grisha14.06.96@mail.r', '000000');
         cy.contains('Такого email нет');
         cy.clearLoginInputs();
     });
-    it('Login check validator email', () => {
-        Cypress.on('uncaught:exception', (err, runnable) => {
-            return false
-          })
-        cy.login('grisha14.06.96', '000000');
+    it('Login check validator email 2', () => {
+        cy.log('INCORRECT EMAIL AND CORRECT PASSWORD');
+        cy.get('#email').type('grisha14.06.96');
+        cy.get('#password').type('000000');
         cy.get('.btn').should('have.attr', 'disabled');
         cy.contains('Error Email');
         cy.clearLoginInputs();
     });
     it('Change body.email request', () => {
-        cy.login('grisha14.06.96@mail.ru', '000000');
+        cy.log('CORRECT EMAIL AND PASSWORD');
         cy.intercept(
             'POST', 
             'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBk7x-WzPnLu0rpZPSjCX4e8BPw5zGWhR0', 
             (req) => {req.body.email = 'blabla@mail.ru'}
         );
+        cy.login('grisha14.06.96@mail.ru', '000000');
         cy.contains('Такого email нет');
         cy.clearLoginInputs();
     });
     it('Password check validator', () => {
+        cy.log('CORRECT EMAIL AND INCORRECT PASSWORD');
         cy.login('grisha14.06.96@mail.ru', '000001');
         cy.contains('Неверный password');
         cy.clearLoginInputs();
     });
+    it('Empty inputs', () => {
+        cy.log('EMPTY EMAIL AND PASSWORD');
+        cy.get('#email').type(' ');
+        cy.get('#password').type(' ');
+        cy.clearLoginInputs();
+        cy.get('.btn').should('have.attr', 'disabled');
+        cy.get('.validation')
+            .children()
+            .each((el) => {
+                expect(el.text()).to.eq('Error')
+            })
+    });
     it('Login success', () => {
+        cy.log('CORRECT EMAIL AND CORRECT PASSWORD');
         cy.login('grisha14.06.96@mail.ru', '000000');
     });
 });
